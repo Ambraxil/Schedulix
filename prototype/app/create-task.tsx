@@ -27,17 +27,38 @@ export default function CreateTask() {
   };
 
   const handleAddTask = () => {
-    const start = new Date(date);
-    const end = new Date(start.getTime() + parseInt(duration) * 60000);
+    // ===== REQUIRED FIELD VALIDATION =====
+    if (!title.trim()) {
+      Alert.alert("Missing Field", "Task title is required.");
+      return;
+    }
 
+    if (!description.trim()) {
+      Alert.alert("Missing Field", "Description is required.");
+      return;
+    }
+
+    if (!duration.trim()) {
+      Alert.alert("Missing Field", "Duration is required.");
+      return;
+    }
+
+    const durationNum = parseInt(duration);
+
+    if (isNaN(durationNum) || durationNum <= 0) {
+      Alert.alert("Invalid Duration", "Enter a valid duration in minutes.");
+      return;
+    }
+
+    const start = new Date(date);
+    const end = new Date(start.getTime() + durationNum * 60000);
+
+    // ===== CONFLICT CHECK =====
     const conflict = initialItems.some((item) => {
       const itemStart = new Date(item.start);
       const itemEnd = new Date(item.end);
-      return (
-        (start >= itemStart && start < itemEnd) ||
-        (end > itemStart && end <= itemEnd) ||
-        (start <= itemStart && end >= itemEnd)
-      );
+
+      return start < itemEnd && end > itemStart;
     });
 
     if (conflict) {
@@ -45,6 +66,7 @@ export default function CreateTask() {
       return;
     }
 
+    // ===== ADD TASK =====
     initialItems.push({
       id: Date.now().toString(),
       title,
@@ -55,8 +77,11 @@ export default function CreateTask() {
     });
 
     Alert.alert("Success", "Task added!");
+
+    // reset fields
     setTitle("");
     setDescription("");
+    setDuration("30");
   };
 
   return (
@@ -102,7 +127,9 @@ export default function CreateTask() {
             }}
           />
 
-          <Text style={{ color: "#94a3b8", marginBottom: 10 }}>Set Date & Time</Text>
+          <Text style={{ color: "#94a3b8", marginBottom: 10 }}>
+            Set Date & Time
+          </Text>
           <TouchableOpacity
             onPress={() => setShowPicker(true)}
             style={{
@@ -113,7 +140,10 @@ export default function CreateTask() {
             }}
           >
             <Text style={{ color: "white" }}>
-              {date.toLocaleString([], { dateStyle: "short", timeStyle: "short" })}
+              {date.toLocaleString([], {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}
             </Text>
           </TouchableOpacity>
 
@@ -141,7 +171,9 @@ export default function CreateTask() {
             }}
           />
 
-          <Text style={{ color: "#94a3b8", marginBottom: 10 }}>Priority</Text>
+          <Text style={{ color: "#94a3b8", marginBottom: 10 }}>
+            Priority
+          </Text>
           <View style={{ flexDirection: "row", gap: 10 }}>
             {["Low", "Medium", "High"].map((p) => (
               <TouchableOpacity
@@ -154,7 +186,9 @@ export default function CreateTask() {
                   backgroundColor: priority === p ? "#3b82f6" : "#1e293b",
                 }}
               >
-                <Text style={{ color: "white", textAlign: "center" }}>{p}</Text>
+                <Text style={{ color: "white", textAlign: "center" }}>
+                  {p}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -168,7 +202,9 @@ export default function CreateTask() {
               marginTop: 30,
             }}
           >
-            <Text style={{ color: "white", textAlign: "center" }}>Add Task</Text>
+            <Text style={{ color: "white", textAlign: "center" }}>
+              Add Task
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
