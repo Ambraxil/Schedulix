@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 
 import CalendarItem from "../components/CalendarItem";
 import BottomNav from "../components/BottomNav";
@@ -7,11 +8,11 @@ import DateSlider from "../components/DateSlider";
 
 import { initialItems } from "../data/calendarItems";
 
-export default function App() {
+export default function Home() {
   const [events] = useState(initialItems);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const router = useRouter();
 
-  // filter by selected day
   const filteredEvents = useMemo(() => {
     return events.filter(
       (event) =>
@@ -20,7 +21,6 @@ export default function App() {
     );
   }, [events, selectedDate]);
 
-  // sort by time of day
   const sortedEvents = useMemo(() => {
     return [...filteredEvents].sort(
       (a, b) =>
@@ -30,37 +30,17 @@ export default function App() {
   }, [filteredEvents]);
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "#020617",
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#020617" }}>
       <View style={{ flex: 1, paddingHorizontal: 18 }}>
-        {/* Header */}
         <View style={{ marginTop: 10, marginBottom: 10 }}>
-          <Text
-            style={{
-              color: "white",
-              fontSize: 22,
-              fontWeight: "700",
-            }}
-          >
+          <Text style={{ color: "white", fontSize: 22, fontWeight: "700" }}>
             Schedulix
           </Text>
-
-          <Text style={{ color: "#94a3b8", marginTop: 6 }}>
-            Good Morning
-          </Text>
+          <Text style={{ color: "#94a3b8", marginTop: 6 }}>Good Morning</Text>
         </View>
 
-        {/* Date Slider */}
-        <DateSlider
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-        />
+        <DateSlider selectedDate={selectedDate} onSelectDate={setSelectedDate} />
 
-        {/* Calendar Items */}
         <ScrollView showsVerticalScrollIndicator={false}>
           {sortedEvents.map((item) => (
             <CalendarItem key={item.id} item={item} />
@@ -68,7 +48,40 @@ export default function App() {
         </ScrollView>
       </View>
 
+      {/* Floating + Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => router.push("/create-task")}
+      >
+        <Text style={styles.plus}>+</Text>
+      </TouchableOpacity>
+
       <BottomNav />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  floatingButton: {
+    position: "absolute",
+    bottom: 140,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  plus: {
+    fontSize: 32,
+    color: "#020617",
+    lineHeight: 36,
+    fontWeight: "700",
+  },
+});

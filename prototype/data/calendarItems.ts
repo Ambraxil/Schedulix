@@ -23,22 +23,22 @@ export const initialItems = [
   {
     id: "4",
     title: "Workout",
-    start: "2026-04-08T12:00:00",
-    end: "2026-04-08T12:30:00",
+    start: "2026-04-09T12:00:00",
+    end: "2026-04-09T12:30:00",
     priority: "Low",
   },
   {
     id: "5",
     title: "Lunch Break",
-    start: "2026-04-08T12:30:00",
-    end: "2026-04-08T13:00:00",
+    start: "2026-04-09T12:30:00",
+    end: "2026-04-09T13:00:00",
     priority: "Medium",
   },
   {
     id: "6",
     title: "Write Blog Post",
-    start: "2026-04-08T13:30:00",
-    end: "2026-04-08T14:30:00",
+    start: "2026-04-10T13:30:00",
+    end: "2026-04-10T14:30:00",
     priority: "High",
   },
 ];
