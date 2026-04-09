@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -9,9 +9,14 @@ import DateSlider from "../components/DateSlider";
 import { initialItems } from "../data/calendarItems";
 
 export default function Home() {
-  const [events] = useState(initialItems);
+  const [events, setEvents] = useState<typeof initialItems>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const router = useRouter();
+
+  // On mount, reset events to a fresh copy of the dataset
+  useEffect(() => {
+    setEvents([...initialItems]);
+  }, []);
 
   const filteredEvents = useMemo(() => {
     return events.filter(
@@ -24,14 +29,17 @@ export default function Home() {
   const sortedEvents = useMemo(() => {
     return [...filteredEvents].sort(
       (a, b) =>
-        new Date(a.start).getTime() -
-        new Date(b.start).getTime()
+        new Date(a.start).getTime() - new Date(b.start).getTime()
     );
   }, [filteredEvents]);
+
+  // Trigger re-render after deletion
+  const handleUpdate = () => setEvents([...events]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#020617" }}>
       <View style={{ flex: 1, paddingHorizontal: 18 }}>
+        {/* Header */}
         <View style={{ marginTop: 10, marginBottom: 10 }}>
           <Text style={{ color: "white", fontSize: 22, fontWeight: "700" }}>
             Schedulix
@@ -39,11 +47,18 @@ export default function Home() {
           <Text style={{ color: "#94a3b8", marginTop: 6 }}>Good Morning</Text>
         </View>
 
+        {/* Date Slider */}
         <DateSlider selectedDate={selectedDate} onSelectDate={setSelectedDate} />
 
+        {/* Calendar Items */}
         <ScrollView showsVerticalScrollIndicator={false}>
           {sortedEvents.map((item) => (
-            <CalendarItem key={item.id} item={item} />
+            <CalendarItem
+              key={item.id}
+              item={item}
+              events={events}       // pass the current state
+              setEvents={setEvents} // allow deletion
+            />
           ))}
         </ScrollView>
       </View>
