@@ -1,8 +1,11 @@
 import React from "react";
 import { View } from "react-native";
+import { usePathname } from "expo-router";
 import NavIcon from "./NavIcon";
 
 export default function BottomNav() {
+  const pathname = usePathname();
+
   return (
     <View
       style={{
@@ -14,11 +17,10 @@ export default function BottomNav() {
         borderTopColor: "#1e293b",
       }}
     >
-      <NavIcon icon="home-outline" label="Dashboard" active />
-      <NavIcon icon="checkmark-circle-outline" label="Tasks" />
-      <NavIcon icon="calendar-outline" label="Calendar" />
-      <NavIcon icon="repeat-outline" label="Habits" />
-      <NavIcon icon="settings-outline" label="Settings" />
+      <NavIcon icon="home-outline" label="Home" active={pathname === "/"} link="/" />
+      <NavIcon icon="checkmark-circle-outline" label="Tasks" active={pathname === "/tasks"} link="/tasks" />
+      <NavIcon icon="repeat-outline" label="Habits" active={pathname === "/habits"} link="/habits" />
+      <NavIcon icon="settings-outline" label="Settings" active={pathname === "/settings"} link="/settings" />
     </View>
   );
 }

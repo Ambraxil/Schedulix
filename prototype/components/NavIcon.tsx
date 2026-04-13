@@ -1,10 +1,16 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
-export default function NavIcon({ icon, label, active }: any) {
+export default function NavIcon({ icon, label, active, link }: any) {
+  const router = useRouter();
+
   return (
-    <TouchableOpacity style={{ alignItems: "center" }}>
+    <TouchableOpacity 
+      style={{ alignItems: "center" }}
+      onPress={() => link && router.push(link)}
+    >
       <Ionicons
         name={icon}
         size={22}

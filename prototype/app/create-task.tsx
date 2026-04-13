@@ -9,9 +9,11 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { initialItems } from "../data/calendarItems";
+import BottomNav from "../components/BottomNav";
 
 export default function CreateTask() {
   const [title, setTitle] = useState("");
@@ -87,7 +89,7 @@ export default function CreateTask() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#020617" }}>
-        <View style={{ padding: 20 }}>
+        <ScrollView style={{ padding: 20, flex: 1 }}>
           <Text style={{ color: "white", fontSize: 22, marginBottom: 20 }}>
             Create Task
           </Text>
@@ -200,13 +202,15 @@ export default function CreateTask() {
               padding: 16,
               borderRadius: 12,
               marginTop: 30,
+              marginBottom: 60,
             }}
           >
             <Text style={{ color: "white", textAlign: "center" }}>
               Add Task
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
+        <BottomNav />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

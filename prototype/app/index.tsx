@@ -2,16 +2,17 @@ import React, { useMemo, useState, useCallback } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
 
 import CalendarItem from "../components/CalendarItem";
 import BottomNav from "../components/BottomNav";
 import DateSlider from "../components/DateSlider";
+import Timeline from "../components/Timeline";
 
 import { initialItems } from "../data/calendarItems";
 
@@ -70,16 +71,9 @@ export default function Home() {
           onSelectDate={setSelectedDate}
         />
 
-        {/* Calendar Items */}
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {sortedEvents.map((item: any) => (
-            <CalendarItem
-              key={item.id}
-              item={item}
-              events={events}
-              setEvents={setEvents}
-            />
-          ))}
+        {/* Timeline View */}
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120, paddingTop: 10 }}>
+          <Timeline events={sortedEvents} />
         </ScrollView>
       </View>
 
