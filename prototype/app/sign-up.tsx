@@ -9,10 +9,14 @@ import {
   Platform,
   ScrollView,
   Switch,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 export default function SignUp() {
   const router = useRouter();
@@ -23,6 +27,34 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!fullName || !email || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill out all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+    if (!acceptTerms) {
+      Alert.alert("Error", "Please accept the Terms & Privacy Policy.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Save the display name to the user's profile
+      await updateProfile(userCredential.user, { displayName: fullName });
+      // The _layout auth guard handles the redirect to "/"
+    } catch (error: any) {
+      Alert.alert("Sign Up Failed", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,8 +145,16 @@ export default function SignUp() {
               <Text style={styles.termsText}>Accept Terms & Privacy Policy</Text>
             </View>
 
-            <TouchableOpacity style={styles.primaryButton}>
-              <Text style={styles.primaryButtonText}>Sign Up</Text>
+            <TouchableOpacity 
+              style={styles.primaryButton}
+              onPress={handleSignUp}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.primaryButtonText}>Sign Up</Text>
+              )}
             </TouchableOpacity>
           </View>
 

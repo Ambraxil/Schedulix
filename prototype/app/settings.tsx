@@ -6,10 +6,13 @@ import {
   ScrollView,
   Switch,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebase";
 import BottomNav from "../components/BottomNav";
 
 interface SettingItemProps {
@@ -25,6 +28,15 @@ export default function Settings() {
   const router = useRouter();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // Auth guard in _layout.tsx redirects to /sign-in automatically
+    } catch (error: any) {
+      Alert.alert("Sign Out Failed", error.message);
+    }
+  };
 
   const SettingItem = ({
     icon,
@@ -115,7 +127,7 @@ export default function Settings() {
 
         <TouchableOpacity 
           style={styles.signOutButton}
-          onPress={() => router.replace("/sign-in")}
+          onPress={handleSignOut}
         >
           <Feather name="log-out" size={20} color="#ef4444" />
           <Text style={styles.signOutText}>Sign Out</Text>

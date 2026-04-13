@@ -21,9 +21,29 @@ export default function TaskDetails() {
 
   const task = initialItems.find((item) => item.id === id);
 
-  const [isEditing, setIsEditing] = useState(false);
+  // Compute derived values safely (empty strings if task not found)
+  const start = task ? new Date(task.start) : null;
+  const end = task ? new Date(task.end) : null;
+  const durationMs = start && end ? end.getTime() - start.getTime() : 0;
+  const durHours = Math.floor(durationMs / 3600000);
+  const durMins = Math.round((durationMs % 3600000) / 60000);
+  const durationStr = durHours > 0
+    ? `${durHours} Hour${durHours > 1 ? "s" : ""}${durMins > 0 ? ` ${durMins} Min` : ""}`
+    : `${durMins} Min`;
+  const deadlineStr = start
+    ? start.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : "";
 
-  // Fallback if task is not found
+  // All hooks must be called unconditionally before any early return
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(task?.title ?? "");
+  const [duration, setDuration] = useState(durationStr);
+  const [deadline, setDeadline] = useState(deadlineStr);
+  const [priority, setPriority] = useState(task?.priority ?? "Medium");
+  const [notes, setNotes] = useState(task?.description ?? "");
+  const [isDone, setIsDone] = useState(!!(task as any)?.isDone);
+
+  // Now safe to early return after all hooks
   if (!task) {
     return (
       <SafeAreaView style={styles.container}>
@@ -39,39 +59,12 @@ export default function TaskDetails() {
     );
   }
 
-  const start = new Date(task.start);
-  const end = new Date(task.end);
-  const durationMs = end.getTime() - start.getTime();
-  const durHours = Math.floor(durationMs / 3600000);
-  const durMins = Math.round((durationMs % 3600000) / 60000);
-  const durationStr =
-    durHours > 0
-      ? `${durHours} Hour${durHours > 1 ? "s" : ""}${
-          durMins > 0 ? ` ${durMins} Min` : ""
-        }`
-      : `${durMins} Min`;
-
-  const deadlineStr = start.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  const [title, setTitle] = useState(task.title);
-  const [duration, setDuration] = useState(durationStr);
-  const [deadline, setDeadline] = useState(deadlineStr);
-  const [priority, setPriority] = useState(task.priority);
-  const [notes, setNotes] = useState(task.description || "");
-  const [isDone, setIsDone] = useState(!!task.isDone);
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-  };
+  const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleToggleDone = () => {
     const newStatus = !isDone;
     setIsDone(newStatus);
-    task.isDone = newStatus;
+    (task as any).isDone = newStatus;
   };
 
   const renderPriority = (level: string) => {
@@ -157,11 +150,7 @@ export default function TaskDetails() {
 
           <Text style={styles.label}>Notes (Optional)</Text>
           <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              !isEditing && styles.inputDisabled,
-            ]}
+            style={[styles.input, styles.textArea, !isEditing && styles.inputDisabled]}
             value={notes}
             onChangeText={setNotes}
             editable={isEditing}
@@ -181,7 +170,7 @@ export default function TaskDetails() {
             </View>
           ) : (
             <View style={styles.actionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.saveBtn, { backgroundColor: isDone ? "#1e293b" : "#10b981" }]}
                 onPress={handleToggleDone}
               >
