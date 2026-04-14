@@ -8,57 +8,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import BottomNav from "../components/BottomNav";
-
-const DUMMY_HABITS = [
-  {
-    id: "1",
-    title: "Read 30 Minutes",
-    schedule: "Daily at 8:00 PM",
-    duration: "30 mins",
-    streak: 12,
-    done: true,
-    color: "#10b981", // Green
-  },
-  {
-    id: "2",
-    title: "Morning Meditation",
-    schedule: "Daily at 7:00 AM",
-    duration: "15 mins",
-    streak: 8,
-    done: true,
-    color: "#10b981", // Green
-  },
-  {
-    id: "3",
-    title: "Workout Session",
-    schedule: "Mon, Wed, Fri at 6:00 PM",
-    duration: "45 mins",
-    streak: 15,
-    done: false,
-    color: "#3b82f6", // Blue
-  },
-  {
-    id: "4",
-    title: "Review Learning Notes",
-    schedule: "Daily at 9:00 PM",
-    duration: "20 mins",
-    streak: 5,
-    done: false,
-    color: "#f59e0b", // Yellow/Orange
-  },
-  {
-    id: "5",
-    title: "Journal Writing",
-    schedule: "Daily at 10:00 PM",
-    duration: "10 mins",
-    streak: 3,
-    done: false,
-    color: "#8b5cf6", // Purple
-  },
-];
+import { initialHabits } from "../data/habits";
 
 export default function Habits() {
+  const router = useRouter();
+  const habits = initialHabits;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -66,7 +23,10 @@ export default function Habits() {
           <Text style={styles.headerTitle}>Habits</Text>
           <Text style={styles.headerSubtitle}>Stay consistent, Rishabh</Text>
         </View>
-        <TouchableOpacity style={styles.addBtnTop}>
+        <TouchableOpacity
+          style={styles.addBtnTop}
+          onPress={() => router.push("/create-habit")}
+        >
           <Feather name="plus" size={20} color="#94a3b8" />
         </TouchableOpacity>
       </View>
@@ -75,10 +35,11 @@ export default function Habits() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {DUMMY_HABITS.map((habit) => (
+        {habits.map((habit) => (
           <TouchableOpacity
             key={habit.id}
             activeOpacity={0.8}
+            onPress={() => router.push({ pathname: "/habit/[id]", params: { id: habit.id } })}
             style={[styles.card, { borderLeftColor: habit.color }]}
           >
             <View style={styles.cardInfo}>
@@ -102,7 +63,10 @@ export default function Habits() {
 
       {/* Floating Add Habits Button */}
       <View style={styles.floatingBtnWrapper}>
-        <TouchableOpacity style={styles.addHabitsBtn}>
+        <TouchableOpacity
+          style={styles.addHabitsBtn}
+          onPress={() => router.push("/create-habit")}
+        >
           <Text style={styles.addHabitsTxt}>+ Add Habits</Text>
         </TouchableOpacity>
       </View>
@@ -113,10 +77,7 @@ export default function Habits() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#020617",
-  },
+  safeArea: { flex: 1, backgroundColor: "#020617" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -125,19 +86,9 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
   },
-  headerLeft: {
-    flex: 1,
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    color: "#64748b",
-    fontSize: 14,
-  },
+  headerLeft: { flex: 1 },
+  headerTitle: { color: "white", fontSize: 26, fontWeight: "bold", marginBottom: 4 },
+  headerSubtitle: { color: "#64748b", fontSize: 14 },
   addBtnTop: {
     width: 40,
     height: 40,
@@ -146,11 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 120, // Leave space for floating button
-    gap: 16,
-  },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 120, gap: 16 },
   card: {
     backgroundColor: "#1e293b",
     borderRadius: 14,
@@ -159,39 +106,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  cardInfo: {
-    flex: 1,
-  },
-  cardTitle: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  cardSchedule: {
-    color: "#94a3b8",
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  cardFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  cardDuration: {
-    color: "#94a3b8",
-    fontSize: 13,
-  },
-  cardStreak: {
-    color: "#f59e0b",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  cardAction: {
-    width: 40,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
+  cardInfo: { flex: 1 },
+  cardTitle: { color: "white", fontSize: 16, fontWeight: "600", marginBottom: 4 },
+  cardSchedule: { color: "#94a3b8", fontSize: 13, marginBottom: 12 },
+  cardFooter: { flexDirection: "row", alignItems: "center", gap: 12 },
+  cardDuration: { color: "#94a3b8", fontSize: 13 },
+  cardStreak: { color: "#f59e0b", fontSize: 13, fontWeight: "600" },
+  cardAction: { width: 40, alignItems: "flex-end", justifyContent: "center" },
   checkedCircle: {
     width: 28,
     height: 28,
@@ -200,27 +121,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  floatingBtnWrapper: {
-    position: "absolute",
-    bottom: 90, // Above BottomNav (which is usually ~70-80px tall)
-    left: 20,
-    right: 20,
-  },
+  floatingBtnWrapper: { position: "absolute", bottom: 90, left: 20, right: 20 },
   addHabitsBtn: {
     backgroundColor: "#3b82f6",
     height: 54,
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
     elevation: 5,
   },
-  addHabitsTxt: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  addHabitsTxt: { color: "white", fontSize: 16, fontWeight: "700" },
 });

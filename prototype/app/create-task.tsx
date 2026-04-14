@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { initialItems } from "../data/calendarItems";
 import BottomNav from "../components/BottomNav";
 
@@ -20,12 +20,33 @@ export default function CreateTask() {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
+  const [showIOSPicker, setShowIOSPicker] = useState(false);
   const [duration, setDuration] = useState("30");
 
-  const onChangeDate = (event: any, selectedDate?: Date) => {
-    setShowPicker(Platform.OS === "ios");
-    if (selectedDate) setDate(selectedDate);
+  const openDatePicker = () => {
+    if (Platform.OS === "android") {
+      // Use the imperative API on Android to avoid the dismiss() crash
+      DateTimePickerAndroid.open({
+        value: date,
+        mode: "date",
+        onChange: (event, selectedDate) => {
+          if (event.type === "set" && selectedDate) {
+            // After picking date, open time picker
+            DateTimePickerAndroid.open({
+              value: selectedDate,
+              mode: "time",
+              onChange: (timeEvent, selectedTime) => {
+                if (timeEvent.type === "set" && selectedTime) {
+                  setDate(selectedTime);
+                }
+              },
+            });
+          }
+        },
+      });
+    } else {
+      setShowIOSPicker(true);
+    }
   };
 
   const handleAddTask = () => {
@@ -133,7 +154,7 @@ export default function CreateTask() {
             Set Date & Time
           </Text>
           <TouchableOpacity
-            onPress={() => setShowPicker(true)}
+            onPress={openDatePicker}
             style={{
               backgroundColor: "#1e293b",
               padding: 14,
@@ -149,12 +170,15 @@ export default function CreateTask() {
             </Text>
           </TouchableOpacity>
 
-          {showPicker && (
+          {Platform.OS === "ios" && showIOSPicker && (
             <DateTimePicker
               value={date}
               mode="datetime"
               display="default"
-              onChange={onChangeDate}
+              onChange={(event, selectedDate) => {
+                setShowIOSPicker(false);
+                if (selectedDate) setDate(selectedDate);
+              }}
             />
           )}
 
